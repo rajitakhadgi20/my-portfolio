@@ -855,16 +855,10 @@ function ProjectCard({ title, tags, tag, desc, img, figma, delay=0, animate=true
 }
 
 /* ── HOME PROJECTS ───────────────────────────────────────────── */
-const HOME_PROJECTS = [
-  { title:"Greenhub Organic Website",   tag:"WEBSITE",    desc:"An e-commerce platform promoting fresh organic products with a clean and sustainable shopping experience.", img:A.pGrn,  figma:FIGMA.greenhub  },
-  { title:"Hotel Booking App",          tag:"MOBILE APP", desc:"A user-friendly hotel reservation app with smart filters, secure payments, and booking management.",        img:A.pHot,  figma:FIGMA.hotel     },
-  { title:"Thulo Help App",             tag:"MOBILE APP", desc:"A service marketplace connecting customers with trusted local professionals for easy booking.",             img:A.pThu,  figma:FIGMA.thulo     },
-  { title:"Trip Land Travel Website",   tag:"WEBSITE",    desc:"A modern travel booking platform for exploring destinations, planning trips, and managing reservations.",    img:A.pTrp,  figma:FIGMA.trip      },
-  { title:"Daily UI Challenges",        tag:"WEBSITE",    desc:"A collection of modern UI design exercises focused on improving visual hierarchy and interface skills.",     img:A.pDay,  figma:FIGMA.dailyui   },
-  { title:"News Website",               tag:"WEBSITE",    desc:"A responsive digital news platform delivering categorized stories with clear navigation.",                  img:A.pNews, figma:FIGMA.news      },
-  { title:"Restaurant POS System",      tag:"POS",        desc:"An intuitive point-of-sale system for managing orders, payments, inventory, and sales efficiently.",        img:A.pPos,  figma:FIGMA.pos       },
-  { title:"Ecommerce Clothing Website", tag:"WEBSITE",    desc:"Stylish online store with smart filters, product options, secure checkout, and bold streetwear design.",   img:A.pEco,  figma:FIGMA.ecommerce },
-];
+/* ── HOME PROJECTS — auto takes first 8 from ALL_PROJECTS ───── */
+// To show latest: add your newest project at the TOP of ALL_PROJECTS above.
+// The first 8 will automatically appear on the homepage.
+const HOME_PROJECTS = ALL_PROJECTS.slice(0, 8);
 
 function Projects({ setPage, setSkipAnim, tk }) {
   const hdr = useReveal("rv");
