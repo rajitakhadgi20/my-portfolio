@@ -653,7 +653,7 @@ function Hero({ setPage, skipAnimation, onAnimDone, tk, toggleTheme }) {
             <HeroSocialIcon key={label} label={label} Icon={Icon} color={isLight?"light":"dark"} url={url}/>
           ))}
         </div>
-        <a href="/Image/Rajita Khadgi_Resume..pdf" download="Rajita Khadgi_Resume.pdf" className="btn-dlcv" style={{
+        <a href="/Image/Rajita Khadgi_Resume.pdf" download="Rajita Khadgi_Resume.pdf" className="btn-dlcv" style={{
           width:178,height:40,background:"#8b31ca",borderRadius:8,
           display:"inline-flex",alignItems:"center",paddingLeft:20,gap:10,
           color:"white",fontFamily:"Inter,sans-serif",fontSize:16,fontWeight:500,
