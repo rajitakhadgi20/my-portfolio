@@ -18,7 +18,7 @@ const A = {
   certC:       "https://www.figma.com/api/mcp/asset/0f5972c0-99db-4ccc-a1a7-2f77539c99f5",
   skFig:       "/Image/Figma (B).png",
   skSkt:       "/Image/Sketch (B).png",
-  skRes:       "/Image/User Research (B).png",
+  skRes:       "/Image/User Rearch (B).png",
   skPro:       "/Image/Prototype (B).png",
   skWeb:       "/Image/Web Design (B).png",
   skWir:       "/Image/Wireframing (B).png",
