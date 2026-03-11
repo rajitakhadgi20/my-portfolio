@@ -3,37 +3,37 @@ import React, { useState, useEffect, useRef } from "react";
 
 /* ── ASSETS ─────────────────────────────────────────────────── */
 const A = {
-  logoDark:    "/Image/Black bg logo.png",
-  logoLight:   "/Image/White Bg Logo.png",
-  heroBg:      "/Image/Hero Section  bg (Black).png",
-  heroBgLight: "/Image/Hero Section bg (white).png",
-  portrait:    "/Image/Hero section my image.png",
-  aboutFront:  "/Image/About us front image.png",
-  aboutFlip:   "/Image/About us front image ( while flip).png",
+  logoDark:    "/image/Black bg logo.png",
+  logoLight:   "/image/White Bg Logo.png",
+  heroBg:      "/image/Hero Section  bg (Black).png",
+  heroBgLight: "/image/Hero Section bg (white).png",
+  portrait:    "/image/Hero section my image.png",
+  aboutFront:  "/image/About us front image.png",
+  aboutFlip:   "/image/About us front image ( while flip).png",
   linkedin:    "https://www.figma.com/api/mcp/asset/d7d9ef5d-370c-42f7-bb37-cba7da5fb195",
   instagram:   "https://www.figma.com/api/mcp/asset/77437e6a-f26d-41ef-ab5c-238015ec5cef",
   dribbble:    "https://www.figma.com/api/mcp/asset/6a94ac26-b6df-43f5-bcb7-cae1bb2061b3",
   certL:       "https://www.figma.com/api/mcp/asset/91b37c93-4de6-43c7-9ca1-2990ed65459b",
   certR:       "https://www.figma.com/api/mcp/asset/9083fa09-57ba-44a6-803d-5b23fa47c77c",
   certC:       "https://www.figma.com/api/mcp/asset/0f5972c0-99db-4ccc-a1a7-2f77539c99f5",
-  skFig:       "/Image/Figma (B).png",
-  skSkt:       "/Image/Sketch (B).png",
-  skRes:       "/Image/User Rearch (B).png",
-  skPro:       "/Image/Prototype (B).png",
-  skWeb:       "/Image/Web Design (B).png",
-  skWir:       "/Image/Wireframing (B).png",
-  skDes:       "/Image/Design System (B).png",
-  skHtm:       "/Image/HTML & CSS (B).png",
-  pGrn:  "/Image/Before Greenhub.png",
-  pHot:  "/Image/Before Hotel booking.png",
-  pThu:  "/Image/Before Thulo help.png",
-  pTrp:  "/Image/Before trip.png",
-  pDay:  "/Image/Before daily ui.png",
-  pNews: "/Image/Before news.png",
-  pPos:  "/Image/Before Pos.png",
-  pEco:  "/Image/Before ecommerce.png",
-  pHyd:  "/Image/Before Hydropower.png",
-  pHim:  "/Image/Before Himalayan.png",
+  skFig:       "/image/Figma (B).png",
+  skSkt:       "/image/Sketch (B).png",
+  skRes:       "/image/User Rearch (B).png",
+  skPro:       "/image/Prototype (B).png",
+  skWeb:       "/image/Web Design (B).png",
+  skWir:       "/image/Wireframing (B).png",
+  skDes:       "/image/Design System (B).png",
+  skHtm:       "/image/HTML & CSS (B).png",
+  pGrn:  "/image/Before Greenhub.png",
+  pHot:  "/image/Before Hotel booking.png",
+  pThu:  "/image/Before Thulo help.png",
+  pTrp:  "/image/Before trip.png",
+  pDay:  "/image/Before daily ui.png",
+  pNews: "/image/Before news.png",
+  pPos:  "/image/Before Pos.png",
+  pEco:  "/image/Before ecommerce.png",
+  pHyd:  "/image/Before Hydropower.png",
+  pHim:  "/image/Before Himalayan.png",
 };
 
 /* ── FIGMA LINKS ─────────────────────────────────────────────── */
@@ -80,8 +80,6 @@ const DARK = {
   cardDesc:     "#dadada",
   cardLink:     "#DBBBF2",
   cardLinkHover:"#fff",
-  cardTag:      "#f6e9ff",
-  cardTagText:  "#5a0297",
   cardShadow:   "rgba(187,114,239,0.30)",
   skillBg:      "#1e1e1e",
   skillBgHov:   "#8b31ca",
@@ -653,7 +651,7 @@ function Hero({ setPage, skipAnimation, onAnimDone, tk, toggleTheme }) {
             <HeroSocialIcon key={label} label={label} Icon={Icon} color={isLight?"light":"dark"} url={url}/>
           ))}
         </div>
-        <a href="/Image/Rajita Khadgi_Resume.pdf" download="Rajita Khadgi_Resume.pdf" className="btn-dlcv" style={{
+        <a href="/image/Rajita Khadgi_Resume.pdf" download="Rajita Khadgi_Resume.pdf" className="btn-dlcv" style={{
           width:178,height:40,background:"#8b31ca",borderRadius:8,
           display:"inline-flex",alignItems:"center",paddingLeft:20,gap:10,
           color:"white",fontFamily:"Inter,sans-serif",fontSize:16,fontWeight:500,
@@ -855,9 +853,6 @@ function ProjectCard({ title, tags, tag, desc, img, figma, delay=0, animate=true
 }
 
 /* ── HOME PROJECTS ───────────────────────────────────────────── */
-/* ── HOME PROJECTS — auto takes first 8 from ALL_PROJECTS ───── */
-// To show latest: add your newest project at the TOP of ALL_PROJECTS above.
-// The first 8 will automatically appear on the homepage.
 const HOME_PROJECTS = ALL_PROJECTS.slice(0, 8);
 
 function Projects({ setPage, setSkipAnim, tk }) {
@@ -1050,7 +1045,7 @@ function Contact({ tk }) {
   const formRef = useRef(null);
 
   const [form, setF]     = useState({ fn:"", ln:"", email:"", subject:"", msg:"" });
-  const [status, setSt]  = useState("idle"); // "idle" | "sending" | "success" | "error"
+  const [status, setSt]  = useState("idle");
 
   const ch = e => setF(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -1153,14 +1148,11 @@ function Contact({ tk }) {
               <label style={lbl}>Message</label>
               <textarea name="msg" placeholder="Type something....." value={form.msg} onChange={ch} style={{ ...inp,height:102,resize:"none",color:form.msg?tk.contactLbl:tk.contactInpText }}/>
             </div>
-
-            {/* Status message */}
             {status === "error" && (
               <p style={{ fontFamily:"Inter,sans-serif",fontSize:13,color:"#ef4444",marginTop:-4 }}>
                 {!form.fn || !form.email || !form.msg ? "Please fill in First Name, Email and Message." : "Something went wrong. Please try again."}
               </p>
             )}
-
             <button
               onClick={handleSubmit}
               disabled={status === "sending"}
