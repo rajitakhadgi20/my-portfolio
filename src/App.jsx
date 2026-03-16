@@ -80,7 +80,7 @@ const DARK = {
   cardDesc:     "#dadada",
   cardLink:     "#DBBBF2",
   cardLinkHover:"#fff",
-  cardTag:      "#3d0070",
+  cardTag:      "#5a0297",
   cardTagText:  "#f6e9ff",
   cardShadow:   "rgba(187,114,239,0.30)",
   skillBg:      "#1e1e1e",
