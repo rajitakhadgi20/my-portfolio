@@ -1019,9 +1019,9 @@ function Certificates({ tk }) {
             onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
             style={{ width:"100%",maxWidth:720,height:287.64,overflowX:hovered?"scroll":"hidden",overflowY:"hidden",position:"relative",borderRadius:4 }}>
             <div style={{ position:"relative",width:800,height:"100%" }}>
-<img src={A.certR} alt="" style={{ position:"absolute",width:hovered?269:220,height:hovered?193:150,left:hovered?491:480,top:hovered?101:60,transform:hovered?"rotate(0deg)":"rotate(12deg)",transformOrigin:"top left",borderRadius:6,objectFit:"cover",transition:T }}/>
-<img src={A.certL} alt="" style={{ position:"absolute",width:hovered?276:220,height:hovered?195:150,left:hovered?-33:-20,top:hovered?101:60,transform:hovered?"rotate(0deg)":"rotate(-12deg)",transformOrigin:"top left",borderRadius:6,objectFit:"cover",transition:T }}/>
-<img src={A.certC} alt="" style={{ position:"absolute",width:hovered?220:300,height:hovered?320:400,left:230,top:hovered?32:-60,borderRadius:6,objectFit:"cover",transition:T }}/>
+<img src={A.certR} alt="" style={{ position:"absolute",width:hovered?269:220,height:hovered?193:150,left:hovered?491:460,top:hovered?101:80,transform:hovered?"rotate(0deg)":"rotate(10deg)",transformOrigin:"top left",borderRadius:6,objectFit:"cover",transition:T }}/>
+<img src={A.certL} alt="" style={{ position:"absolute",width:hovered?276:220,height:hovered?195:150,left:hovered?-33:10,top:hovered?101:80,transform:hovered?"rotate(0deg)":"rotate(-10deg)",transformOrigin:"top left",borderRadius:6,objectFit:"cover",transition:T }}/>
+<img src={A.certC} alt="" style={{ position:"absolute",width:hovered?220:260,height:hovered?320:340,left:240,top:hovered?32:20,borderRadius:6,objectFit:"cover",transition:T }}/>
             </div>
           </div>
         </div>
