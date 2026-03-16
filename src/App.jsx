@@ -13,9 +13,9 @@ const A = {
   linkedin:    "https://www.figma.com/api/mcp/asset/d7d9ef5d-370c-42f7-bb37-cba7da5fb195",
   instagram:   "https://www.figma.com/api/mcp/asset/77437e6a-f26d-41ef-ab5c-238015ec5cef",
   dribbble:    "https://www.figma.com/api/mcp/asset/6a94ac26-b6df-43f5-bcb7-cae1bb2061b3",
-certL: "/image/Web Studio.png",
-certR: "/image/Basic of UI.png",
-certC: "/image/Intro to UI.png",,
+  certL:       "/image/Basic of UI.png",
+  certR:       "/image/Intro to UI.png",
+  certC:       "/image/Web Studio.png",
   skFig:       "/image/Figma (B).png",
   skSkt:       "/image/Sketch (B).png",
   skRes:       "/image/User Rearch (B).png",
@@ -1019,9 +1019,9 @@ function Certificates({ tk }) {
             onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
             style={{ width:"100%",maxWidth:720,height:287.64,overflowX:hovered?"scroll":"hidden",overflowY:"hidden",position:"relative",borderRadius:4 }}>
             <div style={{ position:"relative",width:800,height:"100%" }}>
-              <img src={A.certR} alt="" style={{ position:"absolute",width:hovered?269:272,height:hovered?193:196,left:hovered?491:428,top:hovered?101:81,transform:hovered?"rotate(0deg)":"rotate(9deg)",transformOrigin:"top left",borderRadius:6,objectFit:"cover",transition:T }}/>
-              <img src={A.certL} alt="" style={{ position:"absolute",width:hovered?276:277,height:hovered?195:196,left:hovered?-33:33,top:hovered?101:124,transform:hovered?"rotate(0deg)":"rotate(-9deg)",transformOrigin:"top left",borderRadius:6,objectFit:"cover",transition:T }}/>
-              <img src={A.certC} alt="" style={{ position:"absolute",width:hovered?220:222,height:hovered?320:324,left:257,top:hovered?32:33,borderRadius:6,objectFit:"cover",transition:T }}/>
+              <img src={A.certR} alt="" style={{ position:"absolute",width:hovered?269:242,height:hovered?193:166,left:hovered?491:448,top:hovered?101:101,transform:hovered?"rotate(0deg)":"rotate(9deg)",transformOrigin:"top left",borderRadius:6,objectFit:"cover",transition:T }}/>
+              <img src={A.certL} alt="" style={{ position:"absolute",width:hovered?276:247,height:hovered?195:166,left:hovered?-33:13,top:hovered?101:144,transform:hovered?"rotate(0deg)":"rotate(-9deg)",transformOrigin:"top left",borderRadius:6,objectFit:"cover",transition:T }}/>
+              <img src={A.certC} alt="" style={{ position:"absolute",width:hovered?220:260,height:hovered?320:340,left:237,top:hovered?32:13,borderRadius:6,objectFit:"cover",transition:T }}/>
             </div>
           </div>
         </div>
