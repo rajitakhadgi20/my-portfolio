@@ -240,7 +240,7 @@ for (const path in cmsFiles) {
   }
 }
 
-const MERGED_PROJECTS = [...ALL_PROJECTS, ...CMS_PROJECTS];
+const MERGED_PROJECTS = [...CMS_PROJECTS, ...ALL_PROJECTS];
 
 /* ── GLOBAL CSS ──────────────────────────────────────────────── */
 const CSS = `
