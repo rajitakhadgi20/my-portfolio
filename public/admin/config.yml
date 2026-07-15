@@ -2,8 +2,8 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: public/Image
-public_folder: /Image
+media_folder: public/image
+public_folder: /image
 
 collections:
   - name: "projects"
@@ -14,7 +14,14 @@ collections:
     fields:
       - { label: "Title",       name: "title",  widget: "string" }
       - { label: "Description", name: "desc",   widget: "text" }
-      - { label: "Tag",         name: "tag",    widget: "select", options: ["WEBSITE", "MOBILE APP", "POS", "REDESIGN"] }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        multiple: true
+        allow_add: true
+        field:
+          widget: "select"
+          options: ["WEBSITE", "MOBILE APP", "POS", "REDESIGN"]
       - { label: "Image",       name: "img",    widget: "image" }
       - { label: "Figma Link",  name: "figma",  widget: "string" }
       - { label: "Date",        name: "date",   widget: "datetime" }

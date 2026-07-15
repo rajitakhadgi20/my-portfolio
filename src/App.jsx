@@ -432,6 +432,11 @@ function Navbar({ open, setOpen, page, setPage, tk, toggleTheme }) {
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:16 }}>
           <ThemeToggleBtn tk={tk} toggleTheme={toggleTheme} className="dnav"/>
+          <a href="#login" className="dnav" onClick={() => setPage("login")}
+            style={{ fontFamily:"Inter,sans-serif", fontSize:14, fontWeight:500, color:tk.navLink, cursor:"pointer", transition:"color .2s" }}
+            onMouseEnter={e => e.currentTarget.style.color = tk.navLinkHover}
+            onMouseLeave={e => e.currentTarget.style.color = tk.navLink}
+          >Login</a>
           <a href="#contact" className="bh dnav" onClick={() => setPage("home")}><span>Hire Me</span></a>
           <button className="ham" onClick={() => setOpen(o => !o)}
             aria-expanded={open} aria-controls="mmenu" aria-label="Menu">
@@ -449,14 +454,14 @@ function Navbar({ open, setOpen, page, setPage, tk, toggleTheme }) {
         padding: open ? "16px 24px" : "0 24px",
         transition:"max-height .3s, padding .3s", display:"flex", gap:4,
       }}>
-        {[...LINKS, { label:"Hire Me", href:"#contact", id:"hire" }].map((l) => (
+        {[...LINKS, { label:"Login", href:"#login", id:"login" }, { label:"Hire Me", href:"#contact", id:"hire" }].map((l) => (
           <a key={l.label} href={l.href}
-            onClick={() => { setOpen(false); if (l.id !== "projects") setPage("home"); }}
+            onClick={() => { setOpen(false); if (l.id === "login") setPage("login"); else if (l.id !== "projects") setPage("home"); }}
             style={{
               display:"block", padding:"12px 0", fontSize:16,
-              color: l.id === "hire" ? "#8B31CA" : activeSection === l.id ? "#8B31CA" : tk.navLink,
-              borderBottom: l.id === "hire" ? "none" : `1px solid ${tk.divider}`,
-              marginTop: l.id === "hire" ? 8 : 0,
+              color: l.id === "hire" ? "#8B31CA" : l.id === "login" ? "#8B31CA" : activeSection === l.id ? "#8B31CA" : tk.navLink,
+              borderBottom: (l.id === "hire" || l.id === "login") ? "none" : `1px solid ${tk.divider}`,
+              marginTop: (l.id === "hire" || l.id === "login") ? 8 : 0,
               fontWeight: activeSection === l.id ? 500 : 400,
               transition:"color .2s",
             }}>{l.label}</a>
@@ -1182,12 +1187,335 @@ function Footer({ tk }) {
   );
 }
 
+/* ── LOGIN CSS ──────────────────────────────────────────────── */
+const LOGIN_CSS = `
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@keyframes dotBounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+`;
+
+/* ── LOGIN PAGE ─────────────────────────────────────────────── */
+function Login({ tk, onBack, isRecovery }) {
+  const [email, setEmail]             = useState("");
+  const [password, setPassword]       = useState("");
+  const [confirmPassword, setConfirm] = useState("");
+  const [name, setName]               = useState("");
+  const [mode, setMode]               = useState("signin");
+  const [error, setError]             = useState("");
+  const [loading, setLoading]         = useState(false);
+  const [recoverySent, setRecoverySent] = useState(false);
+  const [passwordReset, setPasswordReset] = useState(false);
+  const [recovering, setRecovering]   = useState(false);
+  const emailRef = useRef(null);
+
+  useEffect(() => {
+    if (isRecovery) {
+      window.netlifyIdentity?.open();
+    }
+  }, [isRecovery]);
+
+  useEffect(() => {
+    if (recovering && emailRef.current) emailRef.current.focus();
+  }, [recovering]);
+
+  const isLight = tk.moonIcon;
+
+  const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+
+  const getIdentity = () => {
+    if (window.netlifyIdentity) return window.netlifyIdentity;
+    setError("Authentication service unavailable. Please try again later.");
+    return null;
+  };
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!email.trim() || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    const identity = getIdentity();
+    if (!identity) return;
+    setLoading(true);
+    try {
+      await identity.login(email, password);
+    } catch (err) {
+      setError(err?.message?.includes("Invalid") ? "Invalid email or password." : "Login failed. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!name.trim() || !email.trim() || !password || !confirmPassword) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    const identity = getIdentity();
+    if (!identity) return;
+    setLoading(true);
+    try {
+      await identity.signup(email, password, { full_name: name });
+    } catch (err) {
+      setError(err?.message?.includes("exists") ? "An account with this email already exists." : "Registration failed. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    setError("");
+    setRecovering(true);
+    setRecoverySent(false);
+    setPasswordReset(false);
+  };
+
+  const handleSendRecovery = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    const identity = getIdentity();
+    if (!identity) return;
+    setLoading(true);
+    try {
+      await identity.sendPasswordRecovery(email);
+      setRecoverySent(true);
+    } catch {
+      setError("Failed to send recovery email. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cardBg   = isLight ? "#FBFBFB" : "#1e1e1e";
+  const cardBdr  = isLight ? "#E1E1E1" : "#555";
+  const pageBg   = isLight ? "#ffffff" : "#0b0013";
+  const titleClr = isLight ? "#464646" : "#F6E9FF";
+  const subClr   = isLight ? "#727272" : "#BCBCBC";
+  const lblClr   = isLight ? "#0B0013" : "#fbfbfb";
+  const inpBg    = isLight ? "#ffffff" : "#272522";
+  const inpBdr   = isLight ? "#BCBCBC" : "#3d3a38";
+  const linkClr  = "#8B31CA";
+  const errBg    = "rgba(239,68,68,0.1)";
+  const errBdr   = "rgba(239,68,68,0.3)";
+  const txtClr   = isLight ? "#1E2A3A" : "#fff";
+
+  const lbl = { fontFamily:"Roboto,sans-serif", fontSize:14, fontWeight:400, lineHeight:"normal", color:lblClr, transition:"color .4s" };
+  const inp = {
+    background: inpBg, border: `1px solid ${inpBdr}`, borderRadius: 8,
+    padding: "10px 14px", fontFamily: "Roboto,sans-serif", fontSize: 14, fontWeight: 400,
+    lineHeight: "24px", color: txtClr, width: "100%", outline: "none",
+    transition: "border-color .2s, background .4s",
+  };
+
+  const btnStyle = {
+    width: "100%", height: 44, background: "#8b31ca", border: "none", borderRadius: 8,
+    color: "#fff", fontFamily: "Inter,sans-serif", fontSize: 16, fontWeight: 500,
+    cursor: loading ? "not-allowed" : "pointer",
+    transition: "opacity .2s, transform .2s",
+    opacity: loading ? 0.7 : 1,
+  };
+
+  const renderContent = () => {
+    if (passwordReset) {
+      return (
+        <div style={{ textAlign:"center", padding:"40px 24px", animation:"fadeInUp .4s ease" }}>
+          <div style={{ width:64, height:64, borderRadius:"50%", background:"rgba(34,197,94,0.15)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 20px" }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:700, fontSize:28, color:titleClr, marginBottom:8, transition:"color .4s" }}>Password Reset Successfully</h2>
+          <p style={{ fontFamily:"Inter,sans-serif", fontSize:14, color:subClr, marginBottom:28, lineHeight:"20px", transition:"color .4s" }}>
+            Your password has been updated. You can now sign in with your new password.
+          </p>
+          <button onClick={() => { setPasswordReset(false); setMode("signin"); setEmail(""); setPassword(""); }} style={btnStyle}
+            onMouseOver={e => { e.currentTarget.style.transform = "translateY(-1px)"; }}
+            onMouseOut={e => { e.currentTarget.style.transform = "none"; }}>Back to Sign In</button>
+        </div>
+      );
+    }
+
+    if (recoverySent) {
+      return (
+        <div style={{ textAlign:"center", padding:"40px 24px", animation:"fadeInUp .4s ease" }}>
+          <div style={{ width:64, height:64, borderRadius:"50%", background:"rgba(139,49,202,0.15)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 20px" }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8B31CA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:700, fontSize:28, color:titleClr, marginBottom:8, transition:"color .4s" }}>Check Your Email</h2>
+          <p style={{ fontFamily:"Inter,sans-serif", fontSize:14, color:subClr, marginBottom:28, lineHeight:"20px", transition:"color .4s" }}>
+            We've sent a password reset link to <strong style={{ color:txtClr }}>{email}</strong>.<br/>Please check your inbox and follow the instructions.
+          </p>
+          <button onClick={() => { setRecoverySent(false); setRecovering(false); setMode("signin"); setEmail(""); setPassword(""); }} style={btnStyle}
+            onMouseOver={e => { e.currentTarget.style.transform = "translateY(-1px)"; }}
+            onMouseOut={e => { e.currentTarget.style.transform = "none"; }}>Back to Sign In</button>
+        </div>
+      );
+    }
+
+    if (recovering) {
+      return (
+        <div style={{ animation:"fadeInUp .4s ease" }}>
+          <button onClick={() => { setRecovering(false); setError(""); setEmail(""); }}
+            style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:6, fontFamily:"Inter,sans-serif", fontSize:14, fontWeight:500, color:linkClr, marginBottom:24, padding:0 }}
+            onMouseOver={e => e.currentTarget.style.opacity = "0.7"}
+            onMouseOut={e => e.currentTarget.style.opacity = "1"}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Back to Sign In
+          </button>
+          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:700, fontSize:28, color:titleClr, marginBottom:4, transition:"color .4s" }}>Forgot Password?</h2>
+          <p style={{ fontFamily:"Inter,sans-serif", fontSize:14, color:subClr, marginBottom:28, lineHeight:"20px", transition:"color .4s" }}>
+            Enter your email address and we'll send you a link to reset your password.
+          </p>
+          {error && <div style={{ background:errBg, border:`1px solid ${errBdr}`, borderRadius:8, padding:"10px 14px", marginBottom:16, fontFamily:"Inter,sans-serif", fontSize:13, color:"#ef4444", animation:"shake .3s ease" }}>{error}</div>}
+          <form onSubmit={handleSendRecovery}>
+            <div style={{ marginBottom:20 }}>
+              <label style={lbl}>Email</label>
+              <input ref={emailRef} type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} style={{ ...inp, marginTop:6 }}/>
+            </div>
+            <button type="submit" disabled={loading} style={btnStyle}
+              onMouseOver={e => { if (!loading) e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseOut={e => { e.currentTarget.style.transform = "none"; }}>
+              {loading ? "Sending…" : "Send Reset Link"}
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ animation:"fadeInUp .4s ease" }}>
+        <div style={{ display:"flex", marginBottom:28, background: isLight ? "#f5f5f5" : "#2a2a2a", borderRadius:10, padding:4, transition:"background .4s" }}>
+          {[["signin","Sign In"],["signup","Sign Up"]].map(([m,label]) => (
+            <button key={m} onClick={() => { setMode(m); setError(""); setEmail(""); setPassword(""); setConfirm(""); setName(""); }}
+              style={{ flex:1, padding:"10px 0", border:"none", borderRadius:8, fontFamily:"Inter,sans-serif", fontSize:14, fontWeight:500, cursor:"pointer", transition:"all .3s ease", position:"relative",
+                background: mode===m ? "#8b31ca" : "transparent",
+                color: mode===m ? "#fff" : (isLight ? "#727272" : "#BCBCBC"),
+              }}>{label}</button>
+          ))}
+        </div>
+        {error && <div style={{ background:errBg, border:`1px solid ${errBdr}`, borderRadius:8, padding:"10px 14px", marginBottom:16, fontFamily:"Inter,sans-serif", fontSize:13, color:"#ef4444", animation:"shake .3s ease" }}>{error}</div>}
+        {mode === "signin" ? (
+          <form onSubmit={handleSignIn}>
+            <div style={{ marginBottom:16 }}>
+              <label style={lbl}>Email</label>
+              <input type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} style={{ ...inp, marginTop:6 }}/>
+            </div>
+            <div style={{ marginBottom:8 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <label style={lbl}>Password</label>
+                <button type="button" onClick={handleForgotPassword}
+                  style={{ background:"none", border:"none", cursor:"pointer", fontFamily:"Inter,sans-serif", fontSize:13, fontWeight:500, color:linkClr, padding:0 }}
+                  onMouseOver={e => e.currentTarget.style.opacity = "0.7"}
+                  onMouseOut={e => e.currentTarget.style.opacity = "1"}>Forgot Password?</button>
+              </div>
+              <input type="password" placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} style={{ ...inp, marginTop:6 }}/>
+            </div>
+            <button type="submit" disabled={loading} style={{ ...btnStyle, marginTop:24 }}
+              onMouseOver={e => { if (!loading) e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseOut={e => { e.currentTarget.style.transform = "none"; }}>
+              {loading ? "Signing In…" : "Sign In"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSignUp}>
+            <div style={{ marginBottom:16 }}>
+              <label style={lbl}>Full Name</label>
+              <input type="text" placeholder="Enter your full name" value={name} onChange={e => setName(e.target.value)} style={{ ...inp, marginTop:6 }}/>
+            </div>
+            <div style={{ marginBottom:16 }}>
+              <label style={lbl}>Email</label>
+              <input type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} style={{ ...inp, marginTop:6 }}/>
+            </div>
+            <div style={{ marginBottom:16 }}>
+              <label style={lbl}>Password</label>
+              <input type="password" placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} style={{ ...inp, marginTop:6 }}/>
+            </div>
+            <div style={{ marginBottom:8 }}>
+              <label style={lbl}>Confirm Password</label>
+              <input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={e => setConfirm(e.target.value)} style={{ ...inp, marginTop:6 }}/>
+            </div>
+            <button type="submit" disabled={loading} style={{ ...btnStyle, marginTop:24 }}
+              onMouseOver={e => { if (!loading) e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseOut={e => { e.currentTarget.style.transform = "none"; }}>
+              {loading ? "Creating Account…" : "Create Account"}
+            </button>
+          </form>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:pageBg, display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px", fontFamily:"Inter,sans-serif", transition:"background .4s ease" }}>
+      <div style={{ width:"100%", maxWidth:420 }}>
+        <div style={{ textAlign:"center", marginBottom:32, animation:"fadeInUp .4s ease" }}>
+          <a href="#home" onClick={onBack} style={{ display:"inline-block", marginBottom:20, cursor:"pointer", textDecoration:"none" }}
+            onMouseOver={e => e.currentTarget.style.transform = "scale(1.05)"}
+            onMouseOut={e => e.currentTarget.style.transform = "scale(1)"}
+          >
+            <img src={isLight ? A.logoLight : A.logoDark} alt="RK" style={{ height:40, margin:"0 auto", transition:"opacity .2s" }}/>
+          </a>
+          <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:700, fontSize:32, color:titleClr, marginBottom:8, transition:"color .4s" }}>
+            {recovering ? "" : passwordReset ? "" : recoverySent ? "" : mode==="signin" ? "Welcome Back" : "Create Account"}
+          </h1>
+          <p style={{ fontFamily:"Inter,sans-serif", fontSize:14, color:subClr, lineHeight:"20px", transition:"color .4s" }}>
+            {recovering ? "" : passwordReset ? "" : recoverySent ? "" : mode==="signin" ? "Sign in to access the admin panel" : "Register to manage content"}
+          </p>
+        </div>
+        <div style={{ background:cardBg, border:`1px solid ${cardBdr}`, borderRadius:16, padding:"32px 28px", boxShadow: isLight ? "0 1px 3px rgba(0,0,0,0.08)" : "0 4px 24px rgba(0,0,0,0.3)", transition:"background .4s, border-color .4s" }}>
+          {renderContent()}
+        </div>
+        <p style={{ textAlign:"center", fontFamily:"Inter,sans-serif", fontSize:13, color:subClr, marginTop:20, transition:"color .4s" }}>
+          <a href="#home" onClick={onBack} style={{ color:linkClr, textDecoration:"none", fontWeight:500 }}
+            onMouseOver={e => e.currentTarget.style.opacity = "0.7"}
+            onMouseOut={e => e.currentTarget.style.opacity = "1"}>Back to Portfolio</a>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /* ── ROOT ────────────────────────────────────────────────────── */
 export default function Portfolio() {
   const [open, setOpen]         = useState(false);
-  const [page, setPage]         = useState("home");
+  const [page, setPage]         = useState(() => {
+    const hash = window.location.hash || "";
+    if (hash.includes("recovery_token=") || hash.startsWith("#recovery")) return "login";
+    return "home";
+  });
   const [skipAnim, setSkipAnim] = useState(false);
   const [isDark, setIsDark]     = useState(true);
+  const [isRecovery, setIsRecovery] = useState(() => {
+    const hash = window.location.hash || "";
+    return hash.includes("recovery_token=") || hash.startsWith("#recovery");
+  });
 
   const tk = isDark ? DARK : LIGHT;
   const toggleTheme = () => setIsDark(d => !d);
@@ -1203,6 +1531,16 @@ export default function Portfolio() {
   }, []);
 
   useEffect(() => {
+    const id = "login-css";
+    if (!document.getElementById(id)) {
+      const s = document.createElement("style");
+      s.id = id; s.textContent = LOGIN_CSS;
+      document.head.appendChild(s);
+    }
+    return () => document.getElementById(id)?.remove();
+  }, []);
+
+  useEffect(() => {
     document.body.style.background = tk.bg;
   }, [isDark]);
 
@@ -1213,28 +1551,68 @@ export default function Portfolio() {
   }, []);
 
   useEffect(() => {
+    if (!window.netlifyIdentity) return;
+    const init = () => {
+      const user = window.netlifyIdentity.currentUser();
+      if (user && page !== "login") {
+        setPage("login");
+      }
+    };
+    const onLogin = () => setPage("login");
+    const onClose = () => { if (page === "home") setPage("home"); };
+    window.netlifyIdentity.on("init", init);
+    window.netlifyIdentity.on("login", onLogin);
+    window.netlifyIdentity.on("close", onClose);
+    return () => {
+      window.netlifyIdentity.off("init", init);
+      window.netlifyIdentity.off("login", onLogin);
+      window.netlifyIdentity.off("close", onClose);
+    };
+  }, [page]);
+
+  useEffect(() => {
     if (page === "projects") window.scrollTo({ top:0 });
   }, [page]);
 
+  useEffect(() => {
+    if (page === "login" && window.netlifyIdentity) {
+      const origOpen = window.netlifyIdentity.open;
+      window.netlifyIdentity.open = () => { window.netlifyIdentity.close(); };
+      return () => { window.netlifyIdentity.open = origOpen; };
+    }
+  }, [page]);
+
+  const handleBackToPortfolio = () => {
+    setIsRecovery(false);
+    setPage("home");
+    window.location.hash = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="pf-root" style={{ background:tk.bg }}>
-      <Navbar open={open} setOpen={setOpen} page={page} setPage={setPage} tk={tk} toggleTheme={toggleTheme}/>
-
-      {page === "projects" ? (
-        <>
-          <AllProjectsPage setPage={setPage} setSkipAnim={setSkipAnim} tk={tk}/>
-          <Footer tk={tk}/>
-        </>
+      {page === "login" ? (
+        <Login tk={tk} onBack={handleBackToPortfolio} isRecovery={isRecovery}/>
       ) : (
         <>
-          <Hero setPage={setPage} skipAnimation={skipAnim} onAnimDone={() => setSkipAnim(true)} tk={tk} toggleTheme={toggleTheme}/>
-          <Ticker tk={tk}/>
-          <About tk={tk}/>
-          <Projects setPage={setPage} setSkipAnim={setSkipAnim} tk={tk}/>
-          <Skills tk={tk}/>
-          <Certificates tk={tk}/>
-          <Contact tk={tk}/>
-          <Footer tk={tk}/>
+          <Navbar open={open} setOpen={setOpen} page={page} setPage={setPage} tk={tk} toggleTheme={toggleTheme}/>
+          {page === "projects" ? (
+            <>
+              <AllProjectsPage setPage={setPage} setSkipAnim={setSkipAnim} tk={tk}/>
+              <Footer tk={tk}/>
+            </>
+          ) : (
+            <>
+              <Hero setPage={setPage} skipAnimation={skipAnim} onAnimDone={() => setSkipAnim(true)} tk={tk} toggleTheme={toggleTheme}/>
+              <Ticker tk={tk}/>
+              <About tk={tk}/>
+              <Projects setPage={setPage} setSkipAnim={setSkipAnim} tk={tk}/>
+              <Skills tk={tk}/>
+              <Certificates tk={tk}/>
+              <Contact tk={tk}/>
+              <Footer tk={tk}/>
+            </>
+          )}
         </>
       )}
     </div>
