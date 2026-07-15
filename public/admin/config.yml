@@ -20,6 +20,7 @@ collections:
         multiple: true
         allow_add: true
         field:
+          name: "tag"
           widget: "select"
           options: ["WEBSITE", "MOBILE APP", "POS", "REDESIGN"]
       - { label: "Image",       name: "img",    widget: "image" }
