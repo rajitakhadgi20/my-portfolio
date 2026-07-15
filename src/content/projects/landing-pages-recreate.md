@@ -1,7 +1,7 @@
 ---
 title: Landing Pages (Recreate)
 desc: Modern landing page recreations featuring responsive layouts,
-  pixel-perfect designs, and clean.
+  pixel-perfect designs, and clean design.
 tag: WEBSITE
 tags:
   - WEBSITE
