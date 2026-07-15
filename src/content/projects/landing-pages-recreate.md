@@ -1,7 +1,6 @@
 ---
 title: Landing Pages (Recreate)
-desc: A showcase of high-quality landing page recreations focused on visual
-  accuracy, responsive layouts, and clean user interfaces.
+desc: Modern landing page recreations with clean layouts and responsive interfaces.
 tag: WEBSITE
 tags:
   - WEBSITE
