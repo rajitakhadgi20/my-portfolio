@@ -195,6 +195,48 @@ const ALL_PROJECTS = [
   { title:"Himalayan Travel Website",    tags:["WEBSITE","REDESIGN"],desc:"A trekking website redesign enhancing user experience and booking flow with a clean, immersive interface.", img:A.pHim,  figma:FIGMA.himalayan  },
 ];
 
+/* ── CMS CONTENT LOADER ─────────────────────────────────────── */
+function parseFrontmatter(raw) {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return null;
+  const lines = match[1].split(/\r?\n/);
+  const data = {};
+  let currentKey = null;
+  for (const line of lines) {
+    const kvMatch = line.match(/^(\w[\w\s]*):\s*"?(.+?)"?\s*$/);
+    if (kvMatch) {
+      currentKey = kvMatch[1].trim();
+      data[currentKey] = kvMatch[2].replace(/"$/,"");
+    } else if (line.match(/^\s{2}- /) && currentKey) {
+      if (!Array.isArray(data[currentKey])) data[currentKey] = [];
+      data[currentKey].push(line.replace(/^\s{2}- /,"").trim());
+    }
+  }
+  return data;
+}
+
+const cmsFiles = import.meta.glob("./src/content/projects/*.md", { query: "?raw", import: "default" });
+
+const CMS_PROJECTS = [];
+for (const path in cmsFiles) {
+  const raw = cmsFiles[path];
+  const fm = parseFrontmatter(typeof raw === "string" ? raw : "");
+  if (fm?.title) {
+    let tags = fm.tags || [];
+    if (!Array.isArray(tags)) tags = tags ? [tags] : [];
+    CMS_PROJECTS.push({
+      title: fm.title,
+      desc: fm.desc || "",
+      tags,
+      img: fm.img || "",
+      figma: fm.figma || "#",
+      date: fm.date || "",
+    });
+  }
+}
+
+const MERGED_PROJECTS = [...ALL_PROJECTS, ...CMS_PROJECTS];
+
 /* ── GLOBAL CSS ──────────────────────────────────────────────── */
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Poppins:wght@500;700&family=Inter:wght@400;500;600&family=Roboto:wght@400;500&display=swap');
@@ -860,7 +902,7 @@ function ProjectCard({ title, tags, tag, desc, img, figma, delay=0, animate=true
 }
 
 /* ── HOME PROJECTS ───────────────────────────────────────────── */
-const HOME_PROJECTS = ALL_PROJECTS.slice(0, 8);
+const HOME_PROJECTS = MERGED_PROJECTS.slice(0, 8);
 
 function Projects({ setPage, setSkipAnim, tk }) {
   const hdr = useReveal("rv");
@@ -911,7 +953,7 @@ function AllProjectsPage({ setPage, setSkipAnim, tk }) {
       <div style={{ padding:"48px 0 120px" }}>
         <div className="pf-inner">
           <div className="ap-grid">
-            {ALL_PROJECTS.map((p,i) => (
+            {MERGED_PROJECTS.map((p,i) => (
               <div key={p.title} style={{
                 opacity: mounted?1:0,
                 transform: mounted?"translateY(0)":"translateY(28px)",
