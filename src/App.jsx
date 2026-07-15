@@ -203,19 +203,23 @@ function parseFrontmatter(raw) {
   const data = {};
   let currentKey = null;
   for (const line of lines) {
-    const kvMatch = line.match(/^(\w[\w\s]*):\s*"?(.+?)"?\s*$/);
-    if (kvMatch) {
-      currentKey = kvMatch[1].trim();
-      data[currentKey] = kvMatch[2].replace(/"$/,"");
-    } else if (line.match(/^\s{2}- /) && currentKey) {
+    if (line.match(/^\s{2}- /) && currentKey) {
       if (!Array.isArray(data[currentKey])) data[currentKey] = [];
       data[currentKey].push(line.replace(/^\s{2}- /,"").trim());
+    } else if (line.match(/^\s{2}\S/) && currentKey && !Array.isArray(data[currentKey])) {
+      data[currentKey] += " " + line.trim();
+    } else {
+      const kvMatch = line.match(/^(\w[\w\s]*):\s*"?(.+?)"?\s*$/);
+      if (kvMatch) {
+        currentKey = kvMatch[1].trim();
+        data[currentKey] = kvMatch[2].replace(/"$/,"");
+      }
     }
   }
   return data;
 }
 
-const cmsFiles = import.meta.glob("./src/content/projects/*.md", { query: "?raw", import: "default" });
+const cmsFiles = import.meta.glob("./content/projects/*.md", { eager: true, query: "?raw", import: "default" });
 
 const CMS_PROJECTS = [];
 for (const path in cmsFiles) {
@@ -224,6 +228,7 @@ for (const path in cmsFiles) {
   if (fm?.title) {
     let tags = fm.tags || [];
     if (!Array.isArray(tags)) tags = tags ? [tags] : [];
+    if (!tags.length && fm.tag) tags = [fm.tag];
     CMS_PROJECTS.push({
       title: fm.title,
       desc: fm.desc || "",
